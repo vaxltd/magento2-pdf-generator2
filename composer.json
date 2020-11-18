@@ -15,10 +15,6 @@
     "0": {
       "type": "composer",
       "url": "https://repo.magento.com/"
-    },
-    "eadesignro/module-eacore": {
-      "type": "git",
-      "url": "git@github.com:vaxltd/eacore.git"
     }
   },
   "license": [
@@ -37,7 +33,6 @@
     "magento/module-backend": "*",
     "magento/module-sales": "*",
     "magento/framework": "*",
-    "eadesignro/module-eacore": "2.4.0",
     "mpdf/mpdf": "7.1.*"
   },
   "require-dev": {
