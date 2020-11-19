@@ -33,7 +33,7 @@
     "magento/module-backend": "*",
     "magento/module-sales": "*",
     "magento/framework": "*",
-    "mpdf/mpdf": "7.1.*"
+    "mpdf/mpdf": "~8.0.4"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "~2.13.0",
