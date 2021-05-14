@@ -80,6 +80,7 @@ class Processor extends Template
             ->setTemplateProcessor([$this, 'getTemplateContent']);
 
         $processor->setVariables($this->getVariables());
+        $processor->setStrictMode(false);
         $this->setUseAbsoluteLinks(true);
         $html = $this->html($processor);
 
