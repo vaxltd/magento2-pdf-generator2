@@ -29,9 +29,6 @@
     }
   ],
   "require": {
-    "magento/module-backend": "101.0.*",
-    "magento/module-sales": "102.0.*",
-    "magento/framework": "~102.0.1",
     "mpdf/mpdf": "^8.0.13"
   },
   "minimum-stability": "dev",
