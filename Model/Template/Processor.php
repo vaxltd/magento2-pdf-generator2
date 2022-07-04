@@ -74,7 +74,7 @@ class Processor extends Template
         $isDesignApplied = $this->applyDesignConfig();
 
         $processor = $this->getTemplateFilter()
-            ->setUseSessionInUrl(false)
+//            ->setUseSessionInUrl(false)
             ->setPlainTemplateMode($this->isPlain())
             ->setIsChildTemplate($this->isChildTemplate())
             ->setTemplateProcessor([$this, 'getTemplateContent']);
