@@ -101,7 +101,7 @@ class Processor extends Template
         $textProcessor = $processor
             ->setStoreId($this->storeId)
             ->setDesignParams([0])
-            ->filter($area);
+            ->filter((string)$area);
 
         return $textProcessor;
     }
