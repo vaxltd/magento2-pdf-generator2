@@ -27,13 +27,19 @@ class UpdatePdfTemplateInvoiceItems implements DataPatchInterface
         $this->templateResource->load($template, 'Invoice VaxLtd', 'template_name');
         if ($template->getId()) {
             $templateBody = $template->getTemplateBody();
+            $templateBody = str_replace(
+                '{{var order.getPayment().getMethodInstance().getTitle()}}',
+                '{{var payment_html | raw}}',
+                $templateBody
+            );
+            $templateBody = str_replace(
+                '{{layout area="frontend" handle="vax_sales_email_order_invoice_items" invoice=$invoice order=$order}}',
+                '{{layout handle="vax_sales_email_order_invoice_items" invoice_id=$invoice_id order_id=$order_id}}',
+                $templateBody
+            );
             $template->setData(
                 'template_body',
-                str_replace(
-                    '{{layout area="frontend" handle="vax_sales_email_order_invoice_items" invoice=$invoice order=$order}}',
-                    '{{layout handle="vax_sales_email_order_invoice_items" invoice_id=$invoice_id order_id=$order_id}}',
-                    $templateBody
-                )
+                $templateBody
             );
             $this->templateResource->save($template);
         }
