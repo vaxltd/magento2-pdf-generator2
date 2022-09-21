@@ -74,7 +74,7 @@ class Processor extends Template
         $isDesignApplied = $this->applyDesignConfig();
 
         $processor = $this->getTemplateFilter()
-            ->setUseSessionInUrl(false)
+//            ->setUseSessionInUrl(false)
             ->setPlainTemplateMode($this->isPlain())
             ->setIsChildTemplate($this->isChildTemplate())
             ->setTemplateProcessor([$this, 'getTemplateContent']);
@@ -101,7 +101,7 @@ class Processor extends Template
         $textProcessor = $processor
             ->setStoreId($this->storeId)
             ->setDesignParams([0])
-            ->filter(__($area));
+            ->filter((string)$area);
 
         return $textProcessor;
     }
