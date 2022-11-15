@@ -3,11 +3,11 @@
 namespace Eadesigndev\Pdfgenerator\Model\Email;
 
 use Magento\Framework\Mail\MailMessageInterface;
-use Zend\Mime\Mime;
-use Zend\Mime\PartFactory;
-use Zend\Mail\MessageFactory as MailFactory;
-use Zend\Mime\MessageFactory as MimeFactory;
-use Zend\Mime\Part;
+use Laminas\Mime\Mime;
+use Laminas\Mime\PartFactory;
+use Laminas\Mail\MessageFactory as MailFactory;
+use Laminas\Mime\MessageFactory as MimeFactory;
+use Laminas\Mime\Part;
 
 /**
  * Class Message
