@@ -3,11 +3,11 @@
 namespace Eadesigndev\Pdfgenerator\Model\Email;
 
 use Magento\Framework\Mail\MailMessageInterface;
-use Zend\Mime\Mime;
-use Zend\Mime\PartFactory;
-use Zend\Mail\MessageFactory as MailFactory;
-use Zend\Mime\MessageFactory as MimeFactory;
-use Zend\Mime\Part;
+use Laminas\Mime\Mime;
+use Laminas\Mime\PartFactory;
+use Laminas\Mail\MessageFactory as MailFactory;
+use Laminas\Mime\MessageFactory as MimeFactory;
+use Laminas\Mime\Part;
 
 /**
  * Class Message
@@ -17,11 +17,17 @@ use Zend\Mime\Part;
 class Message extends \Magento\Framework\Mail\Message implements MailMessageInterface
 {
 
+    /**
+     * @var PartFactory
+     */
     private $partFactory;
 
+    /**
+     * @var MimeFactory
+     */
     private $mimeMessageFactory;
 
-    protected $zendMessage;
+    protected $laminasMessage;
 
     private $attachment;
 
@@ -34,8 +40,8 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     ) {
         $this->partFactory = $partFactory;
         $this->mimeMessageFactory = $mimeMessageFactory;
-        $this->zendMessage = MailFactory::getInstance();
-        $this->zendMessage->setEncoding($charset);
+        $this->laminasMessage = MailFactory::getInstance();
+        $this->laminasMessage->setEncoding($charset);
     }
 
     public function setBodyAttachment($content, $fileName)
@@ -69,7 +75,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
             $body->addPart($attachment);
         }
 
-        $this->zendMessage->setBody($body);
+        $this->laminasMessage->setBody($body);
         return $this;
     }
 
@@ -78,7 +84,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
      */
     public function setSubject($subject)
     {
-        $this->zendMessage->setSubject($subject);
+        $this->laminasMessage->setSubject($subject);
         return $this;
     }
 
@@ -87,7 +93,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
      */
     public function getSubject()
     {
-        return $this->zendMessage->getSubject();
+        return $this->laminasMessage->getSubject();
     }
 
     /**
@@ -95,7 +101,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
      */
     public function getBody()
     {
-        return $this->zendMessage->getBody();
+        return $this->laminasMessage->getBody();
     }
 
     /**
@@ -103,7 +109,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
      */
     public function setFromAddress($fromAddress, $fromName = null)
     {
-        $this->zendMessage->setFrom($fromAddress, $fromName);
+        $this->laminasMessage->setFrom($fromAddress, $fromName);
         return $this;
     }
 
@@ -112,7 +118,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
      */
     public function addTo($toAddress)
     {
-        $this->zendMessage->addTo($toAddress);
+        $this->laminasMessage->addTo($toAddress);
         return $this;
     }
 
@@ -121,7 +127,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
      */
     public function addCc($ccAddress)
     {
-        $this->zendMessage->addCc($ccAddress);
+        $this->laminasMessage->addCc($ccAddress);
         return $this;
     }
 
@@ -130,7 +136,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
      */
     public function addBcc($bccAddress)
     {
-        $this->zendMessage->addBcc($bccAddress);
+        $this->laminasMessage->addBcc($bccAddress);
         return $this;
     }
 
@@ -139,7 +145,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
      */
     public function setReplyTo($replyToAddress)
     {
-        $this->zendMessage->setReplyTo($replyToAddress);
+        $this->laminasMessage->setReplyTo($replyToAddress);
         return $this;
     }
 
@@ -148,13 +154,13 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
      */
     public function getRawMessage()
     {
-        return $this->zendMessage->toString();
+        return $this->laminasMessage->toString();
     }
 
     private function createHtmlMimeFromString($htmlBody)
     {
         $htmlPart = $this->partFactory->create(['content' => $htmlBody]);
-        $htmlPart->setCharset($this->zendMessage->getEncoding());
+        $htmlPart->setCharset($this->laminasMessage->getEncoding());
         $htmlPart->setType(Mime::TYPE_HTML);
         $mimeMessage = $this->mimeMessageFactory->create();
         $mimeMessage->addPart($htmlPart);
