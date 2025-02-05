@@ -11,9 +11,6 @@ use Magento\Framework\Registry;
 
 class Config
 {
-    protected $url;
-    protected $registry;
-
     /**
      * @var UrlInterface
      */
