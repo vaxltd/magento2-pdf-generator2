@@ -47,7 +47,7 @@ class DataTest extends \PHPUnit\Framework\TestCase
      */
     private $subject;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->context = $this->getMockBuilder(Context::class)
             ->setMethods(['getScopeConfig'])
