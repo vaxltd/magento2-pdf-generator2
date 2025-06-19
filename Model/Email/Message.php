@@ -8,6 +8,7 @@ use Laminas\Mime\PartFactory;
 use Laminas\Mail\MessageFactory as MailFactory;
 use Laminas\Mime\MessageFactory as MimeFactory;
 use Laminas\Mime\Part;
+use Symfony\Component\Mime\Part\AbstractPart;
 
 /**
  * Class Message
@@ -58,13 +59,13 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
         return $this;
     }
 
-    public function setMessageType($type)
+    public function setMessageType($type):self
     {
         $this->messageType = $type;
         return $this;
     }
 
-    public function setBody($body)
+    public function setBody($body): self
     {
         if (is_string($body) && $this->messageType === MailMessageInterface::TYPE_HTML) {
             $body = self::createHtmlMimeFromString($body);
@@ -82,7 +83,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function setSubject($subject)
+    public function setSubject($subject): self
     {
         $this->laminasMessage->setSubject($subject);
         return $this;
@@ -91,7 +92,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function getSubject()
+    public function getSubject(): ?string
     {
         return $this->laminasMessage->getSubject();
     }
@@ -99,7 +100,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function getBody()
+    public function getBody(): AbstractPart
     {
         return $this->laminasMessage->getBody();
     }
@@ -107,7 +108,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function setFromAddress($fromAddress, $fromName = null)
+    public function setFromAddress($fromAddress, $fromName = null): self
     {
         $this->laminasMessage->setFrom($fromAddress, $fromName);
         return $this;
@@ -116,7 +117,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function addTo($toAddress)
+    public function addTo($toAddress): self
     {
         $this->laminasMessage->addTo($toAddress);
         return $this;
@@ -125,7 +126,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function addCc($ccAddress)
+    public function addCc($ccAddress): self
     {
         $this->laminasMessage->addCc($ccAddress);
         return $this;
@@ -134,7 +135,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function addBcc($bccAddress)
+    public function addBcc($bccAddress): self
     {
         $this->laminasMessage->addBcc($bccAddress);
         return $this;
@@ -143,7 +144,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function setReplyTo($replyToAddress)
+    public function setReplyTo($replyToAddress): self
     {
         $this->laminasMessage->setReplyTo($replyToAddress);
         return $this;
@@ -152,7 +153,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function getRawMessage()
+    public function getRawMessage(): string
     {
         return $this->laminasMessage->toString();
     }
@@ -170,7 +171,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function setBodyHtml($html)
+    public function setBodyHtml($html): self
     {
         $this->setMessageType(self::TYPE_HTML);
         return $this->setBody($html);
@@ -179,7 +180,7 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * {@inheritdoc}
      */
-    public function setBodyText($text)
+    public function setBodyText($text): self
     {
         $this->setMessageType(self::TYPE_TEXT);
         return $this->setBody($text);
