@@ -3,59 +3,52 @@
 namespace Eadesigndev\Pdfgenerator\Model\Email;
 
 use Magento\Framework\Mail\MailMessageInterface;
-use Laminas\Mime\Mime;
-use Laminas\Mime\PartFactory;
-use Laminas\Mail\MessageFactory as MailFactory;
-use Laminas\Mime\MessageFactory as MimeFactory;
-use Laminas\Mime\Part;
-use Symfony\Component\Mime\Part\AbstractPart;
+use Magento\Framework\Mail\MimeMessageInterfaceFactory;
+use Magento\Framework\Mail\MimePartInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\TextPart;
+use Symfony\Component\Mime\Part\DataPart;
 
 /**
  * Class Message
  * @package Eadesigndev\Pdfgenerator\Model\Email
- * @deprecated
  */
 class Message extends \Magento\Framework\Mail\Message implements MailMessageInterface
 {
 
     /**
-     * @var PartFactory
-     */
-    private $partFactory;
-
-    /**
-     * @var MimeFactory
+     * @var MimeMessageInterfaceFactory
      */
     private $mimeMessageFactory;
 
-    protected $laminasMessage;
+    /**
+     * @var Email
+     */
+    private $message;
 
+    /**
+     * @var MimePartInterface
+     */
     private $attachment;
 
+    /**
+     * @var string
+     */
     private $messageType = self::TYPE_TEXT;
 
-    public function __construct(
-        PartFactory $partFactory,
-        MimeFactory $mimeMessageFactory,
-        $charset = 'utf-8'
-    ) {
-        $this->partFactory = $partFactory;
+    public function __construct(MimeMessageInterfaceFactory $mimeMessageFactory, $charset = 'utf-8')
+    {
+        parent::__construct($charset);
         $this->mimeMessageFactory = $mimeMessageFactory;
-        $this->laminasMessage = MailFactory::getInstance();
-        $this->laminasMessage->setEncoding($charset);
+        $this->message = new Email();
+        $this->message->getHeaders()->addTextHeader('Content-Type', 'text/plain; charset=' . $charset);
     }
 
-    public function setBodyAttachment($content, $fileName)
+    public function setBodyAttachment(string $content, string $fileName, string $contentType = 'application/pdf'): self
     {
-        $attachmentPart = $this->partFactory->create();
-
-        $attachmentPart->setContent($content)
-            ->setType(Mime::TYPE_OCTETSTREAM)
-            ->setEncoding(Mime::ENCODING_BASE64)
-            ->setFileName($fileName)
-            ->setDisposition(Mime::DISPOSITION_ATTACHMENT);
-
-        $this->attachment = $attachmentPart;
+        $attachmentPart = new DataPart($content, $fileName, $contentType);
+        $this->attachment = $this->mimeMessageFactory->createMimePart($attachmentPart);
+        $this->message->attach($attachmentPart);
         return $this;
     }
 
@@ -67,119 +60,77 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
 
     public function setBody($body): self
     {
-        if (is_string($body) && $this->messageType === MailMessageInterface::TYPE_HTML) {
-            $body = self::createHtmlMimeFromString($body);
+        if (is_string($body) && $this->messageType === self::TYPE_HTML) {
+            $body = new TextPart($body, 'utf-8', 'html');
+        } elseif (is_string($body)) {
+            $body = new TextPart($body, 'utf-8', 'plain');
         }
-
-        $attachment = $this->attachment;
-        if (isset($attachment)) {
-            $body->addPart($attachment);
+        if ($this->attachment) {
+            $this->message->setBody($body);
+            $this->message->attach($this->attachment->getBody());
+        } else {
+            $this->message->setBody($body);
         }
-
-        $this->laminasMessage->setBody($body);
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setSubject($subject): self
     {
-        $this->laminasMessage->setSubject($subject);
+        $this->message->subject($subject);
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSubject(): ?string
     {
-        return $this->laminasMessage->getSubject();
+        return $this->message->getSubject();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBody(): AbstractPart
+    public function getBody(): \Symfony\Component\Mime\Part\AbstractPart
     {
-        return $this->laminasMessage->getBody();
+        return $this->message->getBody();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setFromAddress($fromAddress, $fromName = null): self
     {
-        $this->laminasMessage->setFrom($fromAddress, $fromName);
+        $this->message->from(new \Symfony\Component\Mime\Address($fromAddress, $fromName ?? ''));
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addTo($toAddress): self
+    public function addTo($toAddress, ?string $toName = null): self
     {
-        $this->laminasMessage->addTo($toAddress);
+        $this->message->addTo(new \Symfony\Component\Mime\Address($toAddress, $toName ?? ''));
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addCc($ccAddress): self
+    public function addCc($ccAddress, ?string $ccName = null): self
     {
-        $this->laminasMessage->addCc($ccAddress);
+        $this->message->addCc(new \Symfony\Component\Mime\Address($ccAddress, $ccName ?? ''));
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addBcc($bccAddress): self
+    public function addBcc($bccAddress, ?string $bccName = null): self
     {
-        $this->laminasMessage->addBcc($bccAddress);
+        $this->message->addBcc(new \Symfony\Component\Mime\Address($bccAddress, $bccName ?? ''));
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setReplyTo($replyToAddress): self
+    public function setReplyTo($replyToAddress, ?string $replyToName = null): self
     {
-        $this->laminasMessage->setReplyTo($replyToAddress);
+        $this->message->replyTo(new \Symfony\Component\Mime\Address($replyToAddress, $replyToName ?? ''));
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRawMessage(): string
     {
-        return $this->laminasMessage->toString();
+        return $this->message->toString();
     }
 
-    private function createHtmlMimeFromString($htmlBody)
-    {
-        $htmlPart = $this->partFactory->create(['content' => $htmlBody]);
-        $htmlPart->setCharset($this->laminasMessage->getEncoding());
-        $htmlPart->setType(Mime::TYPE_HTML);
-        $mimeMessage = $this->mimeMessageFactory->create();
-        $mimeMessage->addPart($htmlPart);
-        return $mimeMessage;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function setBodyHtml($html): self
     {
         $this->setMessageType(self::TYPE_HTML);
         return $this->setBody($html);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setBodyText($text): self
     {
         $this->setMessageType(self::TYPE_TEXT);
