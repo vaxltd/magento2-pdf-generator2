@@ -1,30 +1,31 @@
 <?php
+/**
+ * Copyright 2015 Adobe
+ * All Rights Reserved.
+ */
+declare(strict_types=1);
 
 namespace Eadesigndev\Pdfgenerator\Model\Email;
 
 use Magento\Framework\Mail\MailMessageInterface;
+use Magento\Framework\Mail\MimeInterface;
 use Magento\Framework\Mail\MimeMessageInterfaceFactory;
 use Magento\Framework\Mail\MimePartInterface;
-use Symfony\Component\Mime\Email;
-use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\TextPart;
+use Symfony\Component\Mime\Message as SymfonyMessage;
 
 /**
- * Class Message
+ * Class Message for email transportation with PDF attachment support
+ *
  * @package Eadesigndev\Pdfgenerator\Model\Email
  */
 class Message extends \Magento\Framework\Mail\Message implements MailMessageInterface
 {
-
     /**
      * @var MimeMessageInterfaceFactory
      */
     private $mimeMessageFactory;
-
-    /**
-     * @var Email
-     */
-    private $message;
 
     /**
      * @var MimePartInterface
@@ -34,106 +35,116 @@ class Message extends \Magento\Framework\Mail\Message implements MailMessageInte
     /**
      * @var string
      */
-    private $messageType = self::TYPE_TEXT;
+    private $messageType = MimeInterface::TYPE_TEXT;
 
-    public function __construct(MimeMessageInterfaceFactory $mimeMessageFactory, $charset = 'utf-8')
-    {
+    /**
+     * Initialize dependencies.
+     *
+     * @param MimeMessageInterfaceFactory $mimeMessageFactory
+     * @param string $charset
+     */
+    public function __construct(
+        MimeMessageInterfaceFactory $mimeMessageFactory,
+        string $charset = 'utf-8'
+    ) {
         parent::__construct($charset);
         $this->mimeMessageFactory = $mimeMessageFactory;
-        $this->message = new Email();
-        $this->message->getHeaders()->addTextHeader('Content-Type', 'text/plain; charset=' . $charset);
     }
 
+    /**
+     * Set attachment for the email.
+     *
+     * @param string $content
+     * @param string $fileName
+     * @param string $contentType
+     * @return $this
+     */
     public function setBodyAttachment(string $content, string $fileName, string $contentType = 'application/pdf'): self
     {
-        $attachmentPart = new DataPart($content, $fileName, $contentType);
-        $this->attachment = $this->mimeMessageFactory->createMimePart($attachmentPart);
-        $this->message->attach($attachmentPart);
+        $attachmentPart = new DataPart($content, $fileName, $contentType, 'base64');
+        $attachmentPart->setDisposition('attachment');
+        $this->attachment = $this->mimeMessageFactory->create(['data' => $attachmentPart]);
         return $this;
     }
 
-    public function setMessageType($type):self
+    /**
+     * Set the message type (text or HTML).
+     *
+     * @param string $type
+     * @return $this
+     * @deprecated Use setBodyHtml or setBodyText directly
+     */
+    public function setMessageType($type): self
     {
         $this->messageType = $type;
         return $this;
     }
 
+    /**
+     * Set the email body.
+     *
+     * @param string|\Symfony\Component\Mime\Part\TextPart|\Symfony\Component\Mime\Message $body
+     * @return $this
+     */
     public function setBody($body): self
     {
-        if (is_string($body) && $this->messageType === self::TYPE_HTML) {
-            $body = new TextPart($body, 'utf-8', 'html');
-        } elseif (is_string($body)) {
-            $body = new TextPart($body, 'utf-8', 'plain');
+        if (is_string($body)) {
+            $body = $this->createMimeFromString($body, $this->messageType);
         }
         if ($this->attachment) {
-            $this->message->setBody($body);
-            $this->message->attach($this->attachment->getBody());
-        } else {
-            $this->message->setBody($body);
+            $currentBody = $body->getBody();
+            if ($currentBody instanceof TextPart) {
+                $parts = [$currentBody, $this->attachment->getBody()];
+                $body = $this->mimeMessageFactory->create(['parts' => $parts]);
+            } else {
+                $body->attach($this->attachment->getBody());
+            }
         }
+        $this->symfonyMessage = $body;
         return $this;
     }
 
-    public function setSubject($subject): self
+    /**
+     * Create mime message from the string.
+     *
+     * @param string $body
+     * @param string $messageType
+     * @return SymfonyMessage
+     */
+    private function createMimeFromString(string $body, string $messageType): SymfonyMessage
     {
-        $this->message->subject($subject);
-        return $this;
+        if ($messageType == MimeInterface::TYPE_HTML) {
+            $part = new TextPart($body, $this->charset, 'html', MimeInterface::ENCODING_QUOTED_PRINTABLE);
+            $part->setDisposition('inline');
+            return new SymfonyMessage(null, $part);
+        }
+
+        $part = new TextPart($body, $this->charset, 'plain', MimeInterface::ENCODING_QUOTED_PRINTABLE);
+        $part->setDisposition('inline');
+        return new SymfonyMessage(null, $part);
     }
 
-    public function getSubject(): ?string
-    {
-        return $this->message->getSubject();
-    }
-
-    public function getBody(): \Symfony\Component\Mime\Part\AbstractPart
-    {
-        return $this->message->getBody();
-    }
-
-    public function setFromAddress($fromAddress, $fromName = null): self
-    {
-        $this->message->from(new \Symfony\Component\Mime\Address($fromAddress, $fromName ?? ''));
-        return $this;
-    }
-
-    public function addTo($toAddress, ?string $toName = null): self
-    {
-        $this->message->addTo(new \Symfony\Component\Mime\Address($toAddress, $toName ?? ''));
-        return $this;
-    }
-
-    public function addCc($ccAddress, ?string $ccName = null): self
-    {
-        $this->message->addCc(new \Symfony\Component\Mime\Address($ccAddress, $ccName ?? ''));
-        return $this;
-    }
-
-    public function addBcc($bccAddress, ?string $bccName = null): self
-    {
-        $this->message->addBcc(new \Symfony\Component\Mime\Address($bccAddress, $bccName ?? ''));
-        return $this;
-    }
-
-    public function setReplyTo($replyToAddress, ?string $replyToName = null): self
-    {
-        $this->message->replyTo(new \Symfony\Component\Mime\Address($replyToAddress, $replyToName ?? ''));
-        return $this;
-    }
-
-    public function getRawMessage(): string
-    {
-        return $this->message->toString();
-    }
-
+    /**
+     * Set the email body as HTML.
+     *
+     * @param mixed $html
+     * @return $this
+     */
     public function setBodyHtml($html): self
     {
-        $this->setMessageType(self::TYPE_HTML);
+        $this->setMessageType(MimeInterface::TYPE_HTML);
         return $this->setBody($html);
     }
 
+    /**
+     * Set the email body as plain text.
+     *
+     * @param mixed $text
+     * @return $this
+     */
     public function setBodyText($text): self
     {
-        $this->setMessageType(self::TYPE_TEXT);
+        $this->setMessageType(MimeInterface::TYPE_TEXT);
         return $this->setBody($text);
     }
 }
