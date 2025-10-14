@@ -102,12 +102,12 @@ class PdfTest extends TestCase
 
         $this->identityContainerMock = $this->getMockBuilder(InvoiceIdentity::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getStore'])
+            ->onlyMethods(['getStore'])
             ->getMock();
 
         $this->storeMock = $this->getMockBuilder(Store::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getStoreId'])
+            ->addMethods(['getStoreId'])
             ->getMock();
 
         $this->identityContainerMock->expects($this->once())
@@ -127,7 +127,7 @@ class PdfTest extends TestCase
             ->getMock();
 
         $this->paymentHelperMock = $this->getMockBuilder(PaymentHelper::class)
-            ->setMethods(['getInfoBlockHtml'])
+            ->onlyMethods(['getInfoBlockHtml'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -178,12 +178,12 @@ class PdfTest extends TestCase
 
         $this->mpdfFactoryfMock = $this->getMockBuilder(MpdfFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(['create'])
+            ->onlyMethods(['create'])
             ->getMock();
 
         $this->mpdfMock = $this->getMockBuilder(Mpdf::class)
             ->disableOriginalConstructor()
-            ->setMethods(['SetHTMLHeader', 'SetHTMLFooter', 'WriteHTML', 'Output'])
+            ->onlyMethods(['SetHTMLHeader', 'SetHTMLFooter', 'WriteHTML', 'Output'])
             ->getMock();
 
         $this->mpdfFactoryfMock->expects($this->once())
@@ -208,7 +208,7 @@ class PdfTest extends TestCase
     {
 
         $this->pdfGeneratorMock = $this->getMockBuilder(Pdfgenerator::class)
-            ->setMethods(['getTemplateCustomForm'])
+            ->addMethods(['getTemplateCustomForm'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -219,7 +219,7 @@ class PdfTest extends TestCase
         $this->subject->setTemplate($this->pdfGeneratorMock);
 
         $this->invoiceMock = $this->getMockBuilder(Invoice::Class)
-            ->setMethods(['getOrder'])
+            ->onlyMethods(['getOrder'])
             ->disableOriginalConstructor()
             ->getMock();
 
