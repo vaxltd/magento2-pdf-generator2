@@ -94,7 +94,7 @@ class PdfTest extends TestCase
 
     private $paymentInstance;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->context = $this->getMockBuilder(Context::class)
             ->disableOriginalConstructor()

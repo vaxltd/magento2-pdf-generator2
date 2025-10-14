@@ -46,7 +46,7 @@ class PdfgeneratorRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     private $pdfGenerator;
 
-    public function setUp()
+    public function setUp(): void
     {
 
         $this->objectManager = new ObjectManager($this);
