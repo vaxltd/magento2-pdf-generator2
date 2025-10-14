@@ -57,7 +57,7 @@ class PdfgeneratorRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $this->pdfGeneratorFactory = $this->getMockBuilder(PdfgeneratorFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(['create'])
+            ->onlyMethods(['create'])
             ->getMock();
 
         /** @var PdfgeneratorModel pdfGenerator */

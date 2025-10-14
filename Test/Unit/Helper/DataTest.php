@@ -50,12 +50,12 @@ class DataTest extends \PHPUnit\Framework\TestCase
     public function setUp(): void
     {
         $this->context = $this->getMockBuilder(Context::class)
-            ->setMethods(['getScopeConfig'])
+            ->onlyMethods(['getScopeConfig'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->scopeConfigInterface = $this->getMockBuilder(ScopeConfigInterface::class)
-            ->setMethods(['getValue', 'isSetFlag'])
+            ->onlyMethods(['getValue', 'isSetFlag'])
             ->getMockForAbstractClass();
 
         $this->context
@@ -64,12 +64,12 @@ class DataTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($this->scopeConfigInterface));
 
         $this->pdfGeneratorCollectionFactory = $this->getMockBuilder(PdfGeneratorCollectionFactory::class)
-            ->setMethods(['create'])
+            ->onlyMethods(['create'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->pdfGeneratorCollection = $this->getMockBuilder(PdfGeneratorCollection::class)
-            ->setMethods(['getSize', 'addStoreFilter', 'addFieldToFilter', 'getLastItem'])
+            ->onlyMethods(['getSize', 'addStoreFilter', 'addFieldToFilter', 'getLastItem'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -118,12 +118,12 @@ class DataTest extends \PHPUnit\Framework\TestCase
 
         $invoiceMock = $this->getMockBuilder(Invoice::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getOrder'])
+            ->onlyMethods(['getOrder'])
             ->getMock();
 
         $orderMock = $this->getMockBuilder(Order::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getStoreId'])
+            ->onlyMethods(['getStoreId'])
             ->getMock();
 
         $invoiceMock->expects($this->once())
