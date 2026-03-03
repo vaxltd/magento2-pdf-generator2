@@ -4,169 +4,180 @@
  * See LICENSE for license details.
  */
 
-namespace Eadesigndev\Pdfgenerator\Test\Unit\Helper;
+// Stub for Magento generated collection factory class (does not exist in vendor)
+namespace Eadesigndev\Pdfgenerator\Model\ResourceModel\Pdfgenerator {
+    if (!class_exists(\Eadesigndev\Pdfgenerator\Model\ResourceModel\Pdfgenerator\CollectionFactory::class)) {
+        class CollectionFactory
+        {
+            public function create(array $data = []) {}
+        }
+    }
+}
 
-use Eadesigndev\Pdfgenerator\Helper\Data as DataHelper;
-use Eadesigndev\Pdfgenerator\Helper\Data;
-use Eadesigndev\Pdfgenerator\Model\Pdfgenerator;
-use Eadesigndev\Pdfgenerator\Model\ResourceModel\Pdfgenerator\CollectionFactory as PdfGeneratorCollectionFactory;
-use Eadesigndev\Pdfgenerator\Model\ResourceModel\Pdfgenerator\Collection as PdfGeneratorCollection;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\App\Helper\Context;
-use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Invoice;
-use Mpdf\Mpdf;
+namespace Eadesigndev\Pdfgenerator\Test\Unit\Helper {
 
-/**
- * Class Test
- * @package Eadesigndev\Pdfgenerator\Test\Unit\Helper
- */
-class DataTest extends \PHPUnit\Framework\TestCase
-{
-    /**
-     * @var ScopeConfigInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $scopeConfigInterface;
-
-    /**
-     * @var Context|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $context;
-    /**
-     * @var PdfGeneratorCollectionFactory|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $pdfGeneratorCollectionFactory;
+    use Eadesigndev\Pdfgenerator\Helper\Data as DataHelper;
+    use Eadesigndev\Pdfgenerator\Helper\Data;
+    use Eadesigndev\Pdfgenerator\Model\Pdfgenerator;
+    use Eadesigndev\Pdfgenerator\Model\ResourceModel\Pdfgenerator\CollectionFactory as PdfGeneratorCollectionFactory;
+    use Eadesigndev\Pdfgenerator\Model\ResourceModel\Pdfgenerator\Collection as PdfGeneratorCollection;
+    use Magento\Framework\App\Config\ScopeConfigInterface;
+    use Magento\Framework\App\Helper\Context;
+    use Magento\Sales\Model\Order;
+    use Magento\Sales\Model\Order\Invoice;
+    use Mpdf\Mpdf;
 
     /**
-     * @var PdfGeneratorCollectionFactory|\PHPUnit_Framework_MockObject_MockObject
+     * Class Test
+     * @package Eadesigndev\Pdfgenerator\Test\Unit\Helper
      */
-    private $pdfGeneratorCollection;
-
-    /**
-     * @var DataHelper
-     */
-    private $subject;
-
-    public function setUp()
+    class DataTest extends \PHPUnit\Framework\TestCase
     {
-        $this->context = $this->getMockBuilder(Context::class)
-            ->setMethods(['getScopeConfig'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        /**
+         * @var ScopeConfigInterface|\PHPUnit_Framework_MockObject_MockObject
+         */
+        private $scopeConfigInterface;
 
-        $this->scopeConfigInterface = $this->getMockBuilder(ScopeConfigInterface::class)
-            ->setMethods(['getValue', 'isSetFlag'])
-            ->getMockForAbstractClass();
+        /**
+         * @var Context|\PHPUnit_Framework_MockObject_MockObject
+         */
+        private $context;
+        /**
+         * @var PdfGeneratorCollectionFactory|\PHPUnit_Framework_MockObject_MockObject
+         */
+        private $pdfGeneratorCollectionFactory;
 
-        $this->context
-            ->expects($this->atLeastOnce())
-            ->method('getScopeConfig')
-            ->will($this->returnValue($this->scopeConfigInterface));
+        /**
+         * @var PdfGeneratorCollectionFactory|\PHPUnit_Framework_MockObject_MockObject
+         */
+        private $pdfGeneratorCollection;
 
-        $this->pdfGeneratorCollectionFactory = $this->getMockBuilder(PdfGeneratorCollectionFactory::class)
-            ->setMethods(['create'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        /**
+         * @var DataHelper
+         */
+        private $subject;
 
-        $this->pdfGeneratorCollection = $this->getMockBuilder(PdfGeneratorCollection::class)
-            ->setMethods(['getSize', 'addStoreFilter', 'addFieldToFilter', 'getLastItem'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        public function setUp(): void
+        {
+            $this->context = $this->getMockBuilder(Context::class)
+                ->onlyMethods(['getScopeConfig'])
+                ->disableOriginalConstructor()
+                ->getMock();
 
-        $this->pdfGeneratorCollectionFactory
-            ->expects($this->once())
-            ->method('create')
-            ->will($this->returnValue($this->pdfGeneratorCollection));
+            $this->scopeConfigInterface = $this->getMockBuilder(ScopeConfigInterface::class)
+                ->onlyMethods(['getValue', 'isSetFlag'])
+                ->getMockForAbstractClass();
 
-        $this->subject = new DataHelper(
-            $this->context,
+            $this->context
+                ->expects($this->atLeastOnce())
+                ->method('getScopeConfig')
+                ->will($this->returnValue($this->scopeConfigInterface));
+
+            $this->pdfGeneratorCollectionFactory = $this->getMockBuilder(PdfGeneratorCollectionFactory::class)
+                ->onlyMethods(['create'])
+                ->disableOriginalConstructor()
+                ->getMock();
+
+            $this->pdfGeneratorCollection = $this->getMockBuilder(PdfGeneratorCollection::class)
+                ->onlyMethods(['getSize', 'addStoreFilter', 'addFieldToFilter', 'getLastItem'])
+                ->disableOriginalConstructor()
+                ->getMock();
+
             $this->pdfGeneratorCollectionFactory
-        );
-    }
+                ->expects($this->once())
+                ->method('create')
+                ->will($this->returnValue($this->pdfGeneratorCollection));
 
-    public function testIsNotEnable()
-    {
-        if (!class_exists(Mpdf::class)) {
-            $this->fail('The class mMPDF must be available');
+            $this->subject = new DataHelper(
+                $this->context,
+                $this->pdfGeneratorCollectionFactory
+            );
         }
 
-        $this->pdfGeneratorCollection->expects($this->once())
-            ->method('getSize')
-            ->will($this->returnValue(0));
+        public function testIsNotEnable()
+        {
+            if (!class_exists(Mpdf::class)) {
+                $this->fail('The class mMPDF must be available');
+            }
 
-        $this->assertFalse($this->subject->isEnable());
-    }
+            $this->pdfGeneratorCollection->expects($this->once())
+                ->method('getSize')
+                ->will($this->returnValue(0));
 
-    public function testIsEnable()
-    {
-        if (!class_exists(Mpdf::class)) {
-            $this->fail('The class mMPDF must be available');
+            $this->assertFalse($this->subject->isEnable());
         }
 
-        $this->pdfGeneratorCollection->expects($this->once())
-            ->method('getSize')
-            ->will($this->returnValue(1));
+        public function testIsEnable()
+        {
+            if (!class_exists(Mpdf::class)) {
+                $this->fail('The class mMPDF must be available');
+            }
 
-        $this->scopeConfigInterface->expects($this->once())
-            ->method('getValue')->willReturn(true);
+            $this->pdfGeneratorCollection->expects($this->once())
+                ->method('getSize')
+                ->will($this->returnValue(1));
 
-        $this->assertTrue($this->subject->isEnable());
-    }
+            $this->scopeConfigInterface->expects($this->once())
+                ->method('getValue')->willReturn(true);
 
-    public function testGetTemplateStatus()
-    {
+            $this->assertTrue($this->subject->isEnable());
+        }
 
-        $invoiceMock = $this->getMockBuilder(Invoice::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getOrder'])
-            ->getMock();
+        public function testGetTemplateStatus()
+        {
 
-        $orderMock = $this->getMockBuilder(Order::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getStoreId'])
-            ->getMock();
+            $invoiceMock = $this->getMockBuilder(Invoice::class)
+                ->disableOriginalConstructor()
+                ->onlyMethods(['getOrder'])
+                ->getMock();
 
-        $invoiceMock->expects($this->once())
-            ->method('getOrder')
-            ->willReturn($orderMock);
+            $orderMock = $this->getMockBuilder(Order::class)
+                ->disableOriginalConstructor()
+                ->onlyMethods(['getStoreId'])
+                ->getMock();
 
-        $orderMock->expects($this->once())
-            ->method('getStoreId')
-            ->willReturn(1);
+            $invoiceMock->expects($this->once())
+                ->method('getOrder')
+                ->willReturn($orderMock);
 
-        $pdfGeenratorMock = $this->getMockBuilder(Pdfgenerator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+            $orderMock->expects($this->once())
+                ->method('getStoreId')
+                ->willReturn(1);
 
-        $this->pdfGeneratorCollection->expects($this->once())
-            ->method('addStoreFilter')
-            ->willReturn($pdfGeenratorMock);
+            $pdfGeenratorMock = $this->getMockBuilder(Pdfgenerator::class)
+                ->disableOriginalConstructor()
+                ->getMock();
 
-        $this->pdfGeneratorCollection->expects($this->once())
-            ->method('getLastItem')
-            ->willReturn($pdfGeenratorMock);
+            $this->pdfGeneratorCollection->expects($this->once())
+                ->method('addStoreFilter')
+                ->willReturn($pdfGeenratorMock);
 
-        $this->pdfGeneratorCollection->expects($this->exactly(2))
-            ->method('addFieldToFilter')
-            ->willReturn($pdfGeenratorMock);
+            $this->pdfGeneratorCollection->expects($this->once())
+                ->method('getLastItem')
+                ->willReturn($pdfGeenratorMock);
 
-        $result = $this->subject->getTemplateStatus($invoiceMock);
+            $this->pdfGeneratorCollection->expects($this->exactly(2))
+                ->method('addFieldToFilter')
+                ->willReturn($pdfGeenratorMock);
 
-        $this->assertInstanceOf(Pdfgenerator::class, $result);
-    }
+            $result = $this->subject->getTemplateStatus($invoiceMock);
 
-    public function testIsEmail()
-    {
-        $this->pdfGeneratorCollection->expects($this->once())
-            ->method('getSize')
-            ->will($this->returnValue(1));
+            $this->assertInstanceOf(Pdfgenerator::class, $result);
+        }
 
-        $scope = $this->scopeConfigInterface;
+        public function testIsEmail()
+        {
+            $this->pdfGeneratorCollection->expects($this->once())
+                ->method('getSize')
+                ->will($this->returnValue(1));
 
-        $scope->expects($this->exactly(2))
-            ->method('getValue')
-            ->willReturn(true);
+            $scope = $this->scopeConfigInterface;
 
-        $this->assertTrue($this->subject->isEmail());
+            $scope->expects($this->exactly(2))
+                ->method('getValue')
+                ->willReturn(true);
+
+            $this->assertTrue($this->subject->isEmail());
+        }
     }
 }
