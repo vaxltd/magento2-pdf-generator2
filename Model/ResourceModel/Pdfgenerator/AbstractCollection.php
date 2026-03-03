@@ -54,8 +54,8 @@ abstract class AbstractCollection extends MagentoAbstractCollection
         ManagerInterface $eventManager,
         StoreManagerInterface $storeManager,
         MetadataPool $metadataPool,
-        AdapterInterface $connection = null,
-        AbstractDb $resource = null
+        ?AdapterInterface $connection = null,
+        ?AbstractDb $resource = null
     ) {
         $this->storeManager = $storeManager;
         $this->metadataPool = $metadataPool;
