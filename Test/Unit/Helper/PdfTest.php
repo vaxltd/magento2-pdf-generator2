@@ -160,9 +160,25 @@ class PdfTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->templatePaperForm->method('getAvailable')
+            ->willReturn([
+                1 => 'A4',
+                2 => 'A3',
+                3 => 'A5',
+                4 => 'A6',
+                5 => 'Letter',
+                6 => 'Legal',
+            ]);
+
         $this->templatePaperOrientation = $this->getMockBuilder(TemplatePaperOrientation::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->templatePaperOrientation->method('getAvailable')
+            ->willReturn([
+                1 => 'Portrait',
+                2 => 'Landscape',
+            ]);
 
         $this->addressMock = $this->getMockBuilder(Address::class)
             ->disableOriginalConstructor()
@@ -208,13 +224,19 @@ class PdfTest extends TestCase
     {
 
         $this->pdfGeneratorMock = $this->getMockBuilder(Pdfgenerator::class)
-            ->addMethods(['getTemplateCustomForm'])
+            ->addMethods(['getTemplateCustomForm', 'getTemplatePaperOri'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->pdfGeneratorMock->expects($this->once())
-            ->method('getTemplateCustomForm')
-            ->will($this->returnValue(1));
+        $this->pdfGeneratorMock->method('getTemplateCustomForm')->willReturn(1);
+        $this->pdfGeneratorMock->method('getTemplatePaperOri')->willReturn(1); // Portrait
+
+        $this->processor->method('processTemplate')->willReturn([
+            'header'   => '<h1>Header</h1>',
+            'footer'   => '<h1>Footer</h1>',
+            'body'     => '<h1>Body</h1>',
+            'filename' => '',
+        ]);
 
         $this->subject->setTemplate($this->pdfGeneratorMock);
 
